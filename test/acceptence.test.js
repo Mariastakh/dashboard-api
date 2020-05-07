@@ -3,10 +3,16 @@ const http = require("chai-http");
 chai.use(http);
 
 describe("Dashboard", () => {
-  it("Get / should return status 200", async (done) => {
+  it("Should log a user in", async (done) => {
     chai
-      .request("http://localhost:8000/")
-      .get("/")
+      .request("http://localhost:8000")
+      .post("/")
+      .type('form')
+      .send({
+          '_method': 'put',
+          'user': 'me',
+          'password': '123'
+      })
       .then((res) => {
         expect(res.status).toBe(200);
         done();
