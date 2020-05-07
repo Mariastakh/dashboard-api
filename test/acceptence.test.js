@@ -2,6 +2,7 @@ const chai = require('chai');
 const http = require("chai-http");
 chai.use(http);
 
+
 describe("Dashboard", () => {
   it("Should log a user in", async (done) => {
     chai
@@ -14,7 +15,7 @@ describe("Dashboard", () => {
           'password': '123'
       })
       .then((res) => {
-        expect(res.status).toBe(200);
+        expect(res.body).toBe("Login Successful!");
         done();
       })
   });
