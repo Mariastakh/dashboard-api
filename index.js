@@ -1,5 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const login = require("./lib/use-cases/LoginUser");
 
 const app = express();
 
@@ -10,7 +11,9 @@ app.get("/", (req, res) => {
 });
 
 app.post("/", (req, res) => {
-  user = res.send("Login Successful!");
+  user = { name: req.body.name, password: req.body.password };
+  response = login(user);
+  res.send(response);
 });
 
 app.listen(8000, () => {
