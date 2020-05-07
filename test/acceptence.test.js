@@ -1,22 +1,8 @@
-const chai = require('chai');
-const http = require("chai-http");
-chai.use(http);
-
+const request = require("supertest");
 
 describe("Dashboard", () => {
-  it("Should log a user in", async (done) => {
-    chai
-      .request("http://localhost:8000")
-      .post("/")
-      .type('form')
-      .send({
-          '_method': 'put',
-          'user': 'me',
-          'password': '123'
-      })
-      .then((res) => {
-        expect(res.body).toBe("Login Successful!");
-        done();
-      })
+  it("Should log a user in", async () => {
+    const response = await request("http://localhost:8000").post("/").send({name: "me"}, {password: "123"}).set('Accept', 'application/json');
+    expect(response.text).toBe("Login Successful!");
   });
 });
