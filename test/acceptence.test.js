@@ -16,15 +16,17 @@ describe("Dashboard", () => {
 
   it("Should have a to do list", async () => {
     const response = await request("http://localhost:8000").get("/todo");
-    expect(response.text).toContain("to do list");
+    const toDoList = JSON.parse(response.text);
+    expect(toDoList).toHaveProperty("status");
+    expect(toDoList).toHaveProperty("task");
   });
 
   it("Should have the news", async () => {
     const response = await request("http://localhost:8000").get("/news");
     const news = JSON.parse(response.text);
-    expect(news).toHaveProperty('title');
-    expect(news).toHaveProperty('link');
-    expect(news).toHaveProperty('content');
+    expect(news).toHaveProperty("title");
+    expect(news).toHaveProperty("link");
+    expect(news).toHaveProperty("content");
   });
 
   it("Should have a football update", async () => {
