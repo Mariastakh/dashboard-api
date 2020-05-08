@@ -17,6 +17,33 @@ app.post("/", (req, res) => {
   res.send(response);
 });
 
+app.get("/dashboard", (req, res) => {
+ const weather = getWeather();
+ const news = getNews();
+ const football = getFootballUpdate();
+ const todoList = getToDoList();
+ const warmer = getWarmer();
+ const photos = getPhotos();
+ const dashboard = [weather, news, football, toDoList, warmer, photos];
+  res.send("widgets");
+})
+
+app.get("/todo", (req, res) => {
+  res.send("to do list");
+})
+
+app.get("/news", (req, res) => {
+  res.send("news");
+})
+
+app.get("/football", (req, res) => {
+  res.send("football");
+})
+
+app.get("/photos", (req, res) => {
+  res.send("paths");
+})
+
 app.listen(8000, () => {
   console.log("Example app listening on port 8000!");
 });
