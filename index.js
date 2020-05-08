@@ -5,6 +5,7 @@ const login = require("./lib/use-cases/LoginUser");
 const searchUser = require("./lib/gateways/searchUser");
 const weather = require("./lib/use-cases/Weather");
 const news = require("./lib/use-cases/News");
+const footballLeagueData = require("./lib/use-cases/FootballLeagueData");
 
 const app = express();
 
@@ -40,15 +41,17 @@ app.get("/news", async (req, res) => {
   res.send(newsUpdate);
 });
 
-app.get("/football", (req, res) => {
-  res.send("football");
+app.get("/football/:team", async (req, res) => {
+  const team = req.params.team;
+  const beatenTeams = await footballLeagueData(team);
+  res.send(beatenTeams);
 });
 
 app.get("/photos", (req, res) => {
   res.send("paths");
 });
 
-app.get("/weather", async  (req, res) => {
+app.get("/weather", async (req, res) => {
   const weatherUpdate = await weather();
   res.send(weatherUpdate);
 });

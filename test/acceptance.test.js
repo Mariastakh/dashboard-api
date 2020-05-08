@@ -22,14 +22,18 @@ describe("Dashboard", () => {
   it("Should have the news", async () => {
     const response = await request("http://localhost:8000").get("/news");
     const news = JSON.parse(response.text);
-    expect(news).toHaveProperty('title');
-    expect(news).toHaveProperty('link');
-    expect(news).toHaveProperty('content');
+    expect(news).toHaveProperty("title");
+    expect(news).toHaveProperty("link");
+    expect(news).toHaveProperty("content");
   });
 
-  it("Should have a football update", async () => {
-    const response = await request("http://localhost:8000").get("/football");
-    expect(response.text).toContain("football");
+  it("Should have a football update for a team", async () => {
+    const response = await request("http://localhost:8000").get(
+      "/football/Inter"
+    );
+   // const teamsBeaten = JSON.parse(response.text);
+    expect(response.status).toBe(200);
+    expect(response.text).toHaveProperty("teams");
   });
 
   it("Should have photos", async () => {
