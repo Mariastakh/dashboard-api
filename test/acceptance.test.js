@@ -1,7 +1,15 @@
 const request = require("supertest");
 
 describe("Dashboard", () => {
-  xit("Should log a user in", async () => {
+  it("Should signup a new user", async () => {
+    const response = await request("http://localhost:8000")
+      .post("/signup")
+      .send({ name: "me", password: "123" })
+      .setEncoding("Accept", "application/json");
+    expect(response.text).toBe("Sign-Up Successful!");
+  });
+  
+  it("Should log a user in", async () => {
     const response = await request("http://localhost:8000")
       .post("/")
       .send({ name: "me", password: "123" })
@@ -22,9 +30,9 @@ describe("Dashboard", () => {
   it("Should have the news", async () => {
     const response = await request("http://localhost:8000").get("/news");
     const news = JSON.parse(response.text);
-    expect(news).toHaveProperty('title');
-    expect(news).toHaveProperty('link');
-    expect(news).toHaveProperty('content');
+    expect(news).toHaveProperty("title");
+    expect(news).toHaveProperty("link");
+    expect(news).toHaveProperty("content");
   });
 
   it("Should have a football update", async () => {

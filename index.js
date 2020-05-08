@@ -14,9 +14,15 @@ app.get("/", (req, res) => {
   res.send("Log in page");
 });
 
-app.post("/", (req, res) => {
+app.post("/", async (req, res) => {
   user = { username: req.body.name, password: req.body.password };
-  response = login({ user: user, gateway: searchUser });
+  response = await login({ user: user, gateway: searchUser });
+  res.send(response);
+});
+
+app.post("/signup", async (req, res) => {
+  user = { username: req.body.name, password: req.body.password };
+  const response = await createNewUser();
   res.send(response);
 });
 
@@ -48,7 +54,7 @@ app.get("/photos", (req, res) => {
   res.send("paths");
 });
 
-app.get("/weather", async  (req, res) => {
+app.get("/weather", async (req, res) => {
   const weatherUpdate = await weather();
   res.send(weatherUpdate);
 });
