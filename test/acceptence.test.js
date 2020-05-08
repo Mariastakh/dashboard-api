@@ -11,7 +11,7 @@ describe("Dashboard", () => {
 
   xit("Should have a list of all the widgets", async () => {
     const response = await request("http://localhost:8000").get("/dashboard");
-    expect(response.text).toContain("widgets");
+    expect(response.text).toContain("coord");
     
   });
 
