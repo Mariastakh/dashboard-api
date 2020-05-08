@@ -1,5 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+require("dotenv").config();
 const login = require("./lib/use-cases/LoginUser");
 const searchUser = require("./lib/gateways/searchUser");
 const weather = require("./lib/use-cases/Weather");
@@ -19,7 +20,7 @@ app.post("/", (req, res) => {
 });
 
 app.get("/dashboard", (req, res) => {
-  const weather = getWeather();
+  const weather = weather();
   const news = getNews();
   const football = getFootballUpdate();
   const todoList = getToDoList();
@@ -45,8 +46,8 @@ app.get("/photos", (req, res) => {
   res.send("paths");
 });
 
-app.get("/weather", (req, res) => {
-  const weahtherUpdate = weather();
+app.get("/weather", async  (req, res) => {
+  const weatherUpdate = await weather();
   res.send(weatherUpdate);
 });
 

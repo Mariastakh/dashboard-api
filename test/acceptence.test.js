@@ -11,8 +11,7 @@ describe("Dashboard", () => {
 
   xit("Should have a list of all the widgets", async () => {
     const response = await request("http://localhost:8000").get("/dashboard");
-    expect(response.text).toContain("coord");
-    
+    expect(response.text).toContain("location");
   });
 
   it("Should have a to do list", async () => {
@@ -34,6 +33,4 @@ describe("Dashboard", () => {
     const response = await request("http://localhost:8000").get("/photos");
     expect(response.text).toContain("paths");
   });
-
-
 });

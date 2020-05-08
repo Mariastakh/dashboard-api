@@ -1,7 +1,8 @@
 const weather = require("../../../lib/use-cases/Weather");
 
 describe("weather", () => {
-  it("should get user coordinates", async () => {
-   
+  xit("should get the location", async () => {
+    const weatherUpdate = await weather();
+    // testing an external service here
   });
 });
