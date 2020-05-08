@@ -33,9 +33,28 @@ app.get("/dashboard", (req, res) => {
 });
 
 app.get("/todo", (req, res) => {
-  username = "Maria"
-  result = getToDoList({username: username, gateway: getToDoListGateway});
+  const username = "Maria";
+  const result = getToDoList({
+    username: username,
+    gateway: getToDoListGateway,
+  });
   res.send(result);
+});
+
+app.post("/todo", (req, res) => {
+  const task = { task: req.body.task, status: req.body.status };
+  addTask({ task, username, addTaskGateway });
+});
+
+app.put("/todo", (req, res) => {
+  const task = { task: req.body.task, status: req.body.status };
+  editTask({ task, username, EditTaskGateway });
+});
+
+app.delete("/todo/:id", (req, res) => {
+  const task_id = req.param.id;
+  deleteTask({ task_id, username, deleteTaskGatway });
+  res.send(200);
 });
 
 app.get("/news", async (req, res) => {

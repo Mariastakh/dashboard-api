@@ -21,6 +21,19 @@ describe("Dashboard", () => {
     expect(toDoList).toHaveProperty("task");
   });
 
+  it("Should let the user add a to-do task", async () => {
+    const response = await request("http://localhost:8000")
+      .post("/todo")
+      .send({ task: "My task", status: "to do" })
+      .set("Accept", "application/json");
+    expect(response.status).toBe(201);
+  });
+
+  it("Should let the user to delete a to-do task", async () => {
+    const response = await request("http://localhost:8000").delete("todo/:id");
+    expect(response.status).toBe(200);
+  });
+
   it("Should have the news", async () => {
     const response = await request("http://localhost:8000").get("/news");
     const news = JSON.parse(response.text);
