@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Log in page");
 });
 
 app.post("/", (req, res) => {
