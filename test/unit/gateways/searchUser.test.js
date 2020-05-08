@@ -1,4 +1,4 @@
-gateway = require("../../../lib/gateways/verifyUser");
+const gateway = require("../../../lib/gateways/searchUser");
 
 const createGateway = (error) => {
   db = {
@@ -9,22 +9,24 @@ const createGateway = (error) => {
       return "Operation was successful";
     }),
   };
+
+  return gateway({ db });
 };
 
 describe("gateway", () => {
   it("queries the database with the appropriate username", async () => {
     const gateway = createGateway([]);
-    const username = "Maria";
+    const user = {username: "Maria"}
     const queryMatch = expect.stringMatching(/username = @username/);
     const paramMatch = expect.arrayContaining([
       {
-        id: "",
+        id: "username",
         type: "VarChar",
         value: "Maria",
       },
     ]);
 
-    await gateway.execute(username);
+    await gateway.execute(user);
 
     expect(db.request).toHaveBeenCalledWith(queryMatch, paramMatch);
   });

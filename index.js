@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const login = require("./lib/use-cases/LoginUser");
-const verifyUser = require("./lib/gateways/verifyUser");
+const searchUser = require("./lib/gateways/searchUser");
 
 const app = express();
 
@@ -12,8 +12,8 @@ app.get("/", (req, res) => {
 });
 
 app.post("/", (req, res) => {
-  user = { name: req.body.name, password: req.body.password };
-  response = login({ user: user, gateway: verifyUser });
+  user = { username: req.body.name, password: req.body.password };
+  response = login({ user: user, gateway: searchUser });
   res.send(response);
 });
 
