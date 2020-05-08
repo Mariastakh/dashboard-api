@@ -11,8 +11,7 @@ describe("Dashboard", () => {
 
   xit("Should have a list of all the widgets", async () => {
     const response = await request("http://localhost:8000").get("/dashboard");
-    expect(response.text).toContain("widgets");
-    
+    expect(response.text).toContain("location");
   });
 
   it("Should have a to do list", async () => {
@@ -22,7 +21,10 @@ describe("Dashboard", () => {
 
   it("Should have the news", async () => {
     const response = await request("http://localhost:8000").get("/news");
-    expect(response.text).toContain("news");
+    const news = JSON.parse(response.text);
+    expect(news).toHaveProperty('title');
+    expect(news).toHaveProperty('link');
+    expect(news).toHaveProperty('content');
   });
 
   it("Should have a football update", async () => {
@@ -34,6 +36,4 @@ describe("Dashboard", () => {
     const response = await request("http://localhost:8000").get("/photos");
     expect(response.text).toContain("paths");
   });
-
-
 });
