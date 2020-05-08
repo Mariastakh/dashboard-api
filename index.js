@@ -14,49 +14,85 @@ app.get("/", (req, res) => {
   res.send("Log in page");
 });
 
-app.post("/", async (req, res) => {
-  user = { username: req.body.name, password: req.body.password };
-  response = await login({ user: user, gateway: searchUser });
-  res.send(response);
+app.post("/", async (req, res, next) => {
+  try {
+    user = { username: req.body.name, password: req.body.password };
+    response = await login({ user: user, gateway: searchUser });
+    res.sendStatus(200);
+  } catch (err) {
+    next(err);
+  }
 });
 
-app.post("/signup", async (req, res) => {
-  user = { username: req.body.name, password: req.body.password };
-  const response = await createNewUser();
-  res.send(response);
+app.post("/signup", async (req, res, next) => {
+  try {
+    const user = {
+      username: req.body.name,
+      password: req.body.password,
+      email: req.body.email,
+    };
+    const response = await createNewUser();
+    res.sendStatus(200);
+  } catch (err) {
+    next(err);
+  }
 });
 
-app.get("/dashboard", (req, res) => {
-  const weather = weather();
-  const news = getNews();
-  const football = getFootballUpdate();
-  const todoList = getToDoList();
-  const warmer = getWarmer();
-  const photos = getPhotos();
-  const dashboard = [weather, news, football, toDoList, warmer, photos];
-  res.send("widgets");
+app.get("/dashboard", async (req, res, next) => {
+  try {
+    const weather = await weather();
+    const news = await getNews();
+    const football = await getFootballUpdate();
+    const todoList = await getToDoList();
+    const warmer = await getWarmer();
+    const photos = await getPhotos();
+    const dashboard = [weather, news, football, toDoList, warmer, photos];
+    res.send(dashboard);
+  } catch (err) {
+    next(err);
+  }
 });
 
-app.get("/todo", (req, res) => {
-  res.send("to do list");
+app.get("/todo", (req, res, next) => {
+  try {
+    res.send("to do list");
+  } catch (err) {
+    next(err);
+  }
 });
 
-app.get("/news", async (req, res) => {
-  const newsUpdate = await news();
-  res.send(newsUpdate);
+app.get("/news", async (req, res, next) => {
+  try {
+    const newsUpdate = await news();
+    res.send(newsUpdate);
+  } catch (err) {
+    next(err);
+  }
 });
 
-app.get("/football", (req, res) => {
-  res.send("football");
+app.get("/football", (req, res, next) => {
+  try {
+    res.send("football");
+  } catch (err) {
+    next(err);
+  }
 });
 
-app.get("/photos", (req, res) => {
-  res.send("paths");
+app.get("/photos", (req, res, next) => {
+  try {
+    res.send("paths");
+  } catch (err) {
+    next(err);
+  }
 });
 
-app.get("/weather", async (req, res) => {
-  const weatherUpdate = await weather();
-  res.send(weatherUpdate);
+app.get("/weather", async (req, res, next) => {
+  try {
+    const weatherUpdate = await weather();
+    res.send(weatherUpdate);
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.listen(8000, () => {
