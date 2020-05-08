@@ -4,6 +4,7 @@ require("dotenv").config();
 const login = require("./lib/use-cases/LoginUser");
 const searchUser = require("./lib/gateways/searchUser");
 const weather = require("./lib/use-cases/Weather");
+const news = require("./lib/use-cases/News");
 
 const app = express();
 
@@ -34,8 +35,9 @@ app.get("/todo", (req, res) => {
   res.send("to do list");
 });
 
-app.get("/news", (req, res) => {
-  res.send("news");
+app.get("/news", async (req, res) => {
+  const newsUpdate = await news();
+  res.send(newsUpdate);
 });
 
 app.get("/football", (req, res) => {

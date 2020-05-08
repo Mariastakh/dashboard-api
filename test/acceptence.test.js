@@ -21,7 +21,10 @@ describe("Dashboard", () => {
 
   it("Should have the news", async () => {
     const response = await request("http://localhost:8000").get("/news");
-    expect(response.text).toContain("news");
+    const news = JSON.parse(response.text);
+    expect(news).toHaveProperty('title');
+    expect(news).toHaveProperty('link');
+    expect(news).toHaveProperty('content');
   });
 
   it("Should have a football update", async () => {
