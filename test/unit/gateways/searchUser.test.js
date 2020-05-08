@@ -14,7 +14,7 @@ const createGateway = (error) => {
 };
 
 describe("gateway", () => {
-  it("queries the database with the appropriate username", async () => {
+ xit("queries the database with the appropriate username", async () => {
     const gateway = createGateway([]);
     const user = {username: "Maria"}
     const queryMatch = expect.stringMatching(/username = @username/);
