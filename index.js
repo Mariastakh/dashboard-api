@@ -5,6 +5,7 @@ const login = require("./lib/use-cases/LoginUser");
 const searchUser = require("./lib/gateways/searchUser");
 const weather = require("./lib/use-cases/Weather");
 const news = require("./lib/use-cases/News");
+const getToDoList = require("./lib/use-cases/ToDoList/getToDoList");
 
 const app = express();
 
@@ -32,7 +33,9 @@ app.get("/dashboard", (req, res) => {
 });
 
 app.get("/todo", (req, res) => {
-  res.send("to do list");
+  username = "Maria"
+  result = getToDoList({username: username, gateway: getToDoListGateway});
+  res.send(result);
 });
 
 app.get("/news", async (req, res) => {
@@ -48,7 +51,7 @@ app.get("/photos", (req, res) => {
   res.send("paths");
 });
 
-app.get("/weather", async  (req, res) => {
+app.get("/weather", async (req, res) => {
   const weatherUpdate = await weather();
   res.send(weatherUpdate);
 });
