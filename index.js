@@ -10,8 +10,19 @@ const app = express();
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Log in page");
+app.post("/signup", async (req, res, next) => {
+  try {
+    user = {
+      username: req.body.username,
+      password: req.body.password,
+      email: req.body.email,
+    };
+    response = await signin({ user: user, gateway: createUser });
+    res.sendStatus(201);
+  } catch (err) {
+    res.sendStatus(400);
+    next(err);
+  }
 });
 
 app.post("/", async (req, res, next) => {
