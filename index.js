@@ -10,6 +10,25 @@ const app = express();
 
 app.use(express.json());
 
+app.use(function (req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
+
+  // Request headers that are allowed:
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-Requested-With,content-type"
+  );
+
+  // Allow cookeies:
+  res.setHeader("Access-Control-Allow-Credentials", true);
+  next();
+});
+
 app.post("/signup", async (req, res, next) => {
   try {
     user = {
@@ -17,7 +36,7 @@ app.post("/signup", async (req, res, next) => {
       password: req.body.password,
       email: req.body.email,
     };
-    response = await signin({ user: user, gateway: createUser });
+    // response = await signin({ user: user, gateway: createUser });
     res.sendStatus(201);
   } catch (err) {
     res.sendStatus(400);
