@@ -1,14 +1,17 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
 require("dotenv").config();
 const login = require("./lib/use-cases/LoginUser");
-const searchUser = require("./lib/gateways/searchUser");
+const signUpUser = require("./lib/use-cases/SignUpUser");
 const weather = require("./lib/use-cases/Weather");
 const news = require("./lib/use-cases/News");
+const searchUser = require("./lib/gateways/searchUser");
+const signUpUserGateway = require("./lib/gateways/signUpUserGateway");
+const dbConnection = require("./lib/pgsqlConnection").pool;
 
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -36,7 +39,11 @@ app.post("/signup", async (req, res, next) => {
       password: req.body.password,
       email: req.body.email,
     };
-    // response = await signin({ user: user, gateway: createUser });
+    await signUpUser({
+      user: user,
+      gateway: signUpUserGateway({ user: user, db: dbConnection }),
+    });
+
     res.sendStatus(201);
   } catch (err) {
     res.sendStatus(400);
@@ -46,24 +53,16 @@ app.post("/signup", async (req, res, next) => {
 
 app.post("/", async (req, res, next) => {
   try {
-    user = { username: req.body.name, password: req.body.password };
-    response = await login({ user: user, gateway: searchUser });
-    res.sendStatus(200);
-  } catch (err) {
-    next(err);
-  }
-});
+    user = { username: req.body.username, password: req.body.password };
 
-app.post("/signup", async (req, res, next) => {
-  try {
-    const user = {
-      username: req.body.name,
-      password: req.body.password,
-      email: req.body.email,
-    };
-    const response = await createNewUser();
+    await login({
+      user: user,
+      gateway: searchUser({ user: user, db: dbConnection }),
+    });
+
     res.sendStatus(200);
   } catch (err) {
+    res.sendStatus(400);
     next(err);
   }
 });
