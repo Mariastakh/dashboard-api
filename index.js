@@ -5,7 +5,7 @@ const signUpUser = require("./lib/use-cases/SignUpUser");
 const weather = require("./lib/use-cases/Weather");
 const news = require("./lib/use-cases/News");
 const searchUser = require("./lib/gateways/searchUser");
-const signUpUserGateway = require("./lib/gateways/signUpUserGateway");
+const signUpUserGateway = require("./lib/gateways/createUserGateway");
 const dbConnection = require("./lib/pgsqlConnection").pool;
 
 const app = express();
