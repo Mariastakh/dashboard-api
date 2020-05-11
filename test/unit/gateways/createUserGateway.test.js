@@ -1,17 +1,18 @@
-const signUpUserGateway = require("../../../lib/gateways/createUserGateway");
+const createUserGateway = require("../../../lib/gateways/createUserGateway");
 
 class dbStub {}
 
 const createGateway = (user, databaseError) => {
-  db = new dbStub();
-  db.query = jest.fn(async () => {
-    if (databaseError) {
-      throw new Error("Database error");
-    }
-    return "user created";
-  });
+  db = {
+    query: jest.fn(async () => {
+      if (databaseError) {
+        throw new Error("Database error");
+      }
+      return "user created";
+    }),
+  };
 
-  return signUpUserGateway({ db });
+  return createUserGateway({ db });
 };
 
 describe("signUpUserGateway", () => {

@@ -1,11 +1,11 @@
 const express = require("express");
 require("dotenv").config();
 const login = require("./lib/use-cases/LoginUser");
-const signUpUser = require("./lib/use-cases/SignUpUser");
+const createUser = require("./lib/use-cases/CreateUser");
 const weather = require("./lib/use-cases/Weather");
 const news = require("./lib/use-cases/News");
 const searchUser = require("./lib/gateways/searchUser");
-const signUpUserGateway = require("./lib/gateways/createUserGateway");
+const createUserGateway = require("./lib/gateways/createUserGateway");
 const dbConnection = require("./lib/pgsqlConnection").pool;
 
 const app = express();
@@ -34,14 +34,14 @@ app.use(function (req, res, next) {
 
 app.post("/signup", async (req, res, next) => {
   try {
-    user = {
+    const user = {
       username: req.body.username,
       password: req.body.password,
       email: req.body.email,
     };
-    await signUpUser({
+    await createUser({
       user: user,
-      gateway: signUpUserGateway({ user: user, db: dbConnection }),
+      gateway: createUserGateway({ user: user, db: dbConnection }),
     });
 
     res.sendStatus(201);

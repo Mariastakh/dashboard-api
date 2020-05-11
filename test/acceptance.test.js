@@ -1,20 +1,20 @@
 const request = require("supertest");
 
 describe("Dashboard", () => {
-  it("Should signup a new user", async () => {
+  xit("Should signup a new user", async () => {
     const response = await request("http://localhost:8000")
       .post("/signup")
-      .send({ name: "me", password: "123" })
+      .send({ name: "me", password: "123", email: "maria@me" })
       .setEncoding("Accept", "application/json");
-    expect(response.text).toBe("Sign-Up Successful!");
+    expect(response.status).toBe(201);
   });
-  
+
   it("Should log a user in", async () => {
     const response = await request("http://localhost:8000")
       .post("/")
-      .send({ name: "me", password: "123" })
+      .send({ name: "james", password: "smelly" })
       .set("Accept", "application/json");
-    expect(response.text).toBe("Login Successful!");
+    expect(response.status).toBe(200);
   });
 
   xit("Should have a list of all the widgets", async () => {

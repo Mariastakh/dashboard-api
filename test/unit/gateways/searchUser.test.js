@@ -1,12 +1,12 @@
 const gateway = require("../../../lib/gateways/searchUser");
 
-const createGateway = (error) => {
+const createGateway = (user, error) => {
   db = {
-    request: jest.fn(async () => {
+    query: jest.fn(async () => {
       if (error) {
         throw new Error("Database error");
       }
-      return "Operation was successful";
+      return user;
     }),
   };
 
@@ -14,20 +14,17 @@ const createGateway = (error) => {
 };
 
 describe("gateway", () => {
- xit("queries the database with the appropriate username", async () => {
+  it("queries the database with the correct query", async () => {
     const gateway = createGateway([]);
-    const user = {username: "Maria"}
-    const queryMatch = expect.stringMatching(/username = @username/);
-    const paramMatch = expect.arrayContaining([
-      {
-        id: "username",
-        type: "VarChar",
-        value: "Maria",
-      },
-    ]);
+    const user = { username: "Maria" };
 
     await gateway.execute(user);
 
-    expect(db.request).toHaveBeenCalledWith(queryMatch, paramMatch);
+    expect(
+      db.query
+    ).toHaveBeenCalledWith(
+      "SELECT username, password FROM member where username =$1",
+      ["Maria"]
+    );
   });
 });
