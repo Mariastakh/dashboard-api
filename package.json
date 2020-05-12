@@ -6,7 +6,9 @@
   "scripts": {
     "start": "serverless offline start --skipCacheInvalidation",
     "test": "jest",
-    "deploy": "serverless deploy"
+    "deploy": "serverless deploy",
+    "debug": "export SLS_DEBUG=* && node --debug ./node_modules/.bin/serverless offline -s dev",
+    "serve": "nodemon index.js"
   },
   "author": "",
   "license": "ISC",

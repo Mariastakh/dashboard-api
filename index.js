@@ -1,6 +1,6 @@
-const serverless = require('serverless-http');
+const serverless = require("serverless-http");
 const express = require("express");
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 const expressSanitizer = require("express-sanitizer");
 const dotenv = require("dotenv").config();
 const login = require("./lib/use-cases/LoginUser");
@@ -58,7 +58,6 @@ app.post("/signup", async (req, res, next) => {
   }
 });
 
-
 app.post("/", async (req, res, next) => {
   try {
     const sanitizedUsername = req.sanitize(req.body.username);
@@ -68,7 +67,7 @@ app.post("/", async (req, res, next) => {
       username: sanitizedUsername,
       password: sanitizedPassword,
     };
-
+    
     await login({
       user: user,
       gateway: searchUser({ user: user, db: dbConnection }),
@@ -115,6 +114,7 @@ app.get("/news", async (req, res, next) => {
 
 app.get("/football", (req, res, next) => {
   try {
+    process.env.PRODUCTION_DB_USER;
     res.send("football");
   } catch (err) {
     next(err);
@@ -142,5 +142,5 @@ app.get("/weather", async (req, res, next) => {
 //   console.log("Example app listening on port 8000!");
 // });
 
-
+//module.exports = app;
 module.exports.handler = serverless(app);

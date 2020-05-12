@@ -1,4 +1,6 @@
-service: my-serverless-app
+app: dashboard
+org: astakhovam94
+service: dashboard
 
 provider:
   name: aws
@@ -11,14 +13,10 @@ provider:
 functions:
   app:
     handler: index.handler
-    # package:
-    #   include:
-    #     - index.js
-    #     - lib/**
-    #     - node_modules/**
     events:
       - http: ANY /
       - http: ANY {proxy+}
 
 plugins:
   - serverless-offline
+      
