@@ -1,14 +1,19 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
+const expressSanitizer = require("express-sanitizer");
 require("dotenv").config();
 const login = require("./lib/use-cases/LoginUser");
-const searchUser = require("./lib/gateways/searchUser");
+const createUser = require("./lib/use-cases/CreateUser");
 const weather = require("./lib/use-cases/Weather");
 const news = require("./lib/use-cases/News");
+const searchUser = require("./lib/gateways/searchUser");
+const createUserGateway = require("./lib/gateways/createUserGateway");
+const dbConnection = require("./lib/pgsqlConnection").pool;
 
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(expressSanitizer());
 
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -31,12 +36,20 @@ app.use(function (req, res, next) {
 
 app.post("/signup", async (req, res, next) => {
   try {
-    user = {
-      username: req.body.username,
-      password: req.body.password,
-      email: req.body.email,
+    const sanitizedUsername = req.sanitize(req.body.username);
+    const sanitizedPassword = req.sanitize(req.body.password);
+    const sanitizedEmail = req.sanitize(req.body.email);
+
+    const user = {
+      username: sanitizedUsername,
+      password: sanitizedPassword,
+      email: sanitizedEmail,
     };
-    // response = await signin({ user: user, gateway: createUser });
+    await createUser({
+      user: user,
+      gateway: createUserGateway({ user: user, db: dbConnection }),
+    });
+
     res.sendStatus(201);
   } catch (err) {
     res.sendStatus(400);
@@ -46,24 +59,22 @@ app.post("/signup", async (req, res, next) => {
 
 app.post("/", async (req, res, next) => {
   try {
-    user = { username: req.body.name, password: req.body.password };
-    response = await login({ user: user, gateway: searchUser });
-    res.sendStatus(200);
-  } catch (err) {
-    next(err);
-  }
-});
+    const sanitizedUsername = req.sanitize(req.body.username);
+    const sanitizedPassword = req.sanitize(req.body.password);
 
-app.post("/signup", async (req, res, next) => {
-  try {
     const user = {
-      username: req.body.name,
-      password: req.body.password,
-      email: req.body.email,
+      username: sanitizedUsername,
+      password: sanitizedPassword,
     };
-    const response = await createNewUser();
+
+    await login({
+      user: user,
+      gateway: searchUser({ user: user, db: dbConnection }),
+    });
+
     res.sendStatus(200);
   } catch (err) {
+    res.sendStatus(400);
     next(err);
   }
 });

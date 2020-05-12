@@ -1,33 +1,54 @@
 const gateway = require("../../../lib/gateways/searchUser");
 
-const createGateway = (error) => {
+const createGateway = (user, error) => {
   db = {
-    request: jest.fn(async () => {
+    query: jest.fn(() => {
       if (error) {
+        //console.log("inside db error ");
         throw new Error("Database error");
-      }
-      return "Operation was successful";
+      } else 
+        return user;
+      
     }),
   };
 
   return gateway({ db });
 };
 
-describe("gateway", () => {
- xit("queries the database with the appropriate username", async () => {
-    const gateway = createGateway([]);
-    const user = {username: "Maria"}
-    const queryMatch = expect.stringMatching(/username = @username/);
-    const paramMatch = expect.arrayContaining([
-      {
-        id: "username",
-        type: "VarChar",
-        value: "Maria",
-      },
-    ]);
+describe("searchUserTest", () => {
+  let user, gateway, result;
 
-    await gateway.execute(user);
+  describe("when we call the gateway with a valid user", () => {
+    beforeEach(() => {
+      user = { username: "Maria" };
+      gateway = createGateway([user]);
+      result = gateway.execute(user);
+    });
 
-    expect(db.request).toHaveBeenCalledWith(queryMatch, paramMatch);
+    it("should call the database with a valid query", () => {
+      expect(
+        db.query
+      ).toHaveBeenCalledWith(
+        "SELECT username, password FROM member where username =$1",
+        ["Maria"]
+      );
+    });
+
+    it("should return a user", () => {
+      expect(result.length).toBe(1);
+    });
+  });
+
+  describe("when we call the gateway with an non-existant user", () => {
+    beforeEach(() => {
+      user = { username: "nonexistant" };
+      const error = true;
+      gateway = createGateway(user, true);
+      result = gateway.execute(user);
+    });
+
+    it("should throw an error", () => {
+      expect(gateway.execute(user)).toThrowError(new Error('yuck, octopus flavor'));
+    });
   });
 });
