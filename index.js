@@ -1,6 +1,8 @@
+const serverless = require("serverless-http");
 const express = require("express");
+const bodyParser = require("body-parser");
 const expressSanitizer = require("express-sanitizer");
-require("dotenv").config();
+const dotenv = require("dotenv").config();
 const login = require("./lib/use-cases/LoginUser");
 const createUser = require("./lib/use-cases/CreateUser");
 const weather = require("./lib/use-cases/Weather");
@@ -11,13 +13,12 @@ const dbConnection = require("./lib/pgsqlConnection").pool;
 
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(expressSanitizer());
 
 app.use(function (req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-
+  res.setHeader("Access-Control-Allow-Origin", "http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com");
+  
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, OPTIONS, PUT, PATCH, DELETE"
@@ -66,7 +67,7 @@ app.post("/", async (req, res, next) => {
       username: sanitizedUsername,
       password: sanitizedPassword,
     };
-
+    
     await login({
       user: user,
       gateway: searchUser({ user: user, db: dbConnection }),
@@ -113,6 +114,7 @@ app.get("/news", async (req, res, next) => {
 
 app.get("/football", (req, res, next) => {
   try {
+    process.env.PRODUCTION_DB_USER;
     res.send("football");
   } catch (err) {
     next(err);
@@ -136,8 +138,9 @@ app.get("/weather", async (req, res, next) => {
   }
 });
 
-app.listen(8000, () => {
-  console.log("Example app listening on port 8000!");
-});
+// app.listen(8000, () => {
+//   console.log("Example app listening on port 8000!");
+// });
 
-module.exports = app;
+//module.exports = app;
+module.exports.handler = serverless(app);

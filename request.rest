@@ -1,8 +1,7 @@
-POST http://localhost:8000/signup
+POST  https://kgflzthsn8.execute-api.eu-west-2.amazonaws.com/production/
 Content-Type: application/json
 
 {
-   "username": "kyle",
-   "password": "12345",
-   "email": "me@moo"
+   "username": "1",
+   "password": "2"
 }
