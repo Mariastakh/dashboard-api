@@ -1,4 +1,5 @@
 const express = require("express");
+const expressSanitizer = require("express-sanitizer");
 require("dotenv").config();
 const login = require("./lib/use-cases/LoginUser");
 const createUser = require("./lib/use-cases/CreateUser");
@@ -12,6 +13,7 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(expressSanitizer());
 
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -34,10 +36,14 @@ app.use(function (req, res, next) {
 
 app.post("/signup", async (req, res, next) => {
   try {
+    const sanitizedUsername = req.sanitize(req.body.username);
+    const sanitizedPassword = req.sanitize(req.body.password);
+    const sanitizedEmail = req.sanitize(req.body.email);
+
     const user = {
-      username: req.body.username,
-      password: req.body.password,
-      email: req.body.email,
+      username: sanitizedUsername,
+      password: sanitizedPassword,
+      email: sanitizedEmail,
     };
     await createUser({
       user: user,
@@ -53,7 +59,13 @@ app.post("/signup", async (req, res, next) => {
 
 app.post("/", async (req, res, next) => {
   try {
-    user = { username: req.body.username, password: req.body.password };
+    const sanitizedUsername = req.sanitize(req.body.username);
+    const sanitizedPassword = req.sanitize(req.body.password);
+
+    const user = {
+      username: sanitizedUsername,
+      password: sanitizedPassword,
+    };
 
     await login({
       user: user,
