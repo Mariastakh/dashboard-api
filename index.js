@@ -4,8 +4,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const expressSanitizer = require("express-sanitizer");
-
-// JWT Middleware stuff:
+const session = require("express-session");
 
 const login = require("./lib/use-cases/LoginUser");
 const createUser = require("./lib/use-cases/CreateUser");
@@ -19,7 +18,22 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(expressSanitizer());
+app.use(
+  session({
+    key: "user_sid",
+    secret: "somerandonstuffs",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      expires: 600000,
+      secure: false,
+      httpOnly: false,
+    },
+  })
+);
+
 //"http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com",
+
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
 
@@ -38,6 +52,13 @@ app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Credentials", true);
   next();
 });
+
+// app.use((req, res, next) => {
+//   if (req.cookies.user_sid && !req.session.user) {
+//     res.clearCookie("user_sid");
+//   }
+//   next();
+// });
 
 // format of token:
 // Authorization: Bearer <access_token>
@@ -61,6 +82,26 @@ function verifyToken(req, res, next) {
     res.sendStatus(403);
   }
 }
+
+// app.use((req, res, next) => {
+//   if (req.cookies.user_sid && !req.session.user) {
+//     res.clearCookie("user_sid");
+//   }
+//   next();
+// });
+
+app.get("/status", async (req, res, next) => {
+  console.log(req);
+  if (req.session.user && req.cookies.user_sid) {
+    res.json({
+      message: "woo you're a user!",
+    });
+  } else {
+    res.json({
+      message: "not signed in init",
+    });
+  }
+});
 
 app.post("/signup", async (req, res, next) => {
   try {
@@ -102,6 +143,7 @@ app.post("/", async (req, res, next) => {
 
     jwt.sign({ user }, `${process.env.SECRET_KEY}`, (err, token) => {
       res.json({
+        user,
         token,
       });
     });
