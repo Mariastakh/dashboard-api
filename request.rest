@@ -1,7 +1,11 @@
-POST  https://kgflzthsn8.execute-api.eu-west-2.amazonaws.com/production/
-Content-Type: application/json
+# POST  http://localhost:8000/
+# Content-Type: application/json
 
-{
-   "username": "1",
-   "password": "2"
-}
+# {
+#    "username": "james",
+#    "password": "smelly"
+# }
+
+GET  http://localhost:8000/todo
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoiamFtZXMiLCJwYXNzd29yZCI6InNtZWxseSJ9LCJpYXQiOjE1ODkzNzkxMjR9.n3gnz5FE9J7JX1Ami5M6p73PNh6PsT0WjA_DnNl5a-Y

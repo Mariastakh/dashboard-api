@@ -1,8 +1,12 @@
+const dotenv = require("dotenv").config();
 const serverless = require("serverless-http");
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const expressSanitizer = require("express-sanitizer");
-const dotenv = require("dotenv").config();
+
+// JWT Middleware stuff:
+
 const login = require("./lib/use-cases/LoginUser");
 const createUser = require("./lib/use-cases/CreateUser");
 const weather = require("./lib/use-cases/Weather");
@@ -17,8 +21,11 @@ app.use(bodyParser.json());
 app.use(expressSanitizer());
 
 app.use(function (req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com");
-  
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com"
+  );
+
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, OPTIONS, PUT, PATCH, DELETE"
@@ -34,6 +41,28 @@ app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Credentials", true);
   next();
 });
+
+// format of token:
+// Authorization: Bearer <access_token>
+
+function verifyToken(req, res, next) {
+  // get the auth header value.
+  const bearerHeader = req.headers["authorization"];
+  // check if bearer is undefined:
+  if (bearerHeader !== undefined) {
+    // pull the token  out of the bearer:
+    // 1. split the bearer header on the space:
+    const bearer = bearerHeader.split(" ");
+    // 2. get the token from the aray:
+    const bearerToken = bearer[1];
+    // set the token:
+    req.token = bearerToken;
+    next();
+  } else {
+    // forbidden:
+    res.sendStatus(403);
+  }
+}
 
 app.post("/signup", async (req, res, next) => {
   try {
@@ -67,20 +96,26 @@ app.post("/", async (req, res, next) => {
       username: sanitizedUsername,
       password: sanitizedPassword,
     };
-    
+
     await login({
       user: user,
       gateway: searchUser({ user: user, db: dbConnection }),
     });
 
-    res.sendStatus(200);
+    jwt.sign({ user }, `${process.env.SECRET_KEY}`, (err, token) => {
+      res.json({
+        token,
+      });
+    });
+
+    //res.sendStatus(200);
   } catch (err) {
     res.sendStatus(400);
     next(err);
   }
 });
 
-app.get("/dashboard", async (req, res, next) => {
+app.get("/dashboard", verifyToken, async (req, res, next) => {
   try {
     const weather = await weather();
     const news = await getNews();
@@ -95,10 +130,17 @@ app.get("/dashboard", async (req, res, next) => {
   }
 });
 
-app.get("/todo", (req, res, next) => {
+app.get("/todo", verifyToken, async (req, res, next) => {
   try {
-    res.send("to do list");
+    jwt.verify(req.token,  `${process.env.SECRET_KEY}`, (error, authData) => {
+      if (error) {
+        res.sendStatus(403);
+      } else {
+        res.json({ message: "to do list:", authData });
+      }
+    });
   } catch (err) {
+    res.send(400);
     next(err);
   }
 });
@@ -138,9 +180,9 @@ app.get("/weather", async (req, res, next) => {
   }
 });
 
-// app.listen(8000, () => {
-//   console.log("Example app listening on port 8000!");
-// });
+app.listen(8000, () => {
+  console.log("Example app listening on port 8000!");
+});
 
-//module.exports = app;
-module.exports.handler = serverless(app);
+module.exports = app;
+//module.exports.handler = serverless(app);
