@@ -19,12 +19,9 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(expressSanitizer());
-
+//"http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com",
 app.use(function (req, res, next) {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com"
-  );
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
 
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -57,6 +54,7 @@ function verifyToken(req, res, next) {
     const bearerToken = bearer[1];
     // set the token:
     req.token = bearerToken;
+
     next();
   } else {
     // forbidden:
@@ -132,7 +130,7 @@ app.get("/dashboard", verifyToken, async (req, res, next) => {
 
 app.get("/todo", verifyToken, async (req, res, next) => {
   try {
-    jwt.verify(req.token,  `${process.env.SECRET_KEY}`, (error, authData) => {
+    jwt.verify(req.token, `${process.env.SECRET_KEY}`, (error, authData) => {
       if (error) {
         res.sendStatus(403);
       } else {
