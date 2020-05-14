@@ -7,6 +7,7 @@ const login = require("./lib/use-cases/LoginUser");
 const createUser = require("./lib/use-cases/CreateUser");
 const weather = require("./lib/use-cases/Weather");
 const news = require("./lib/use-cases/News");
+const pie = require("./lib/utility/pie");
 const searchUser = require("./lib/gateways/searchUser");
 const createUserGateway = require("./lib/gateways/createUserGateway");
 const dbConnection = require("./lib/pgsqlConnection").pool;
@@ -120,6 +121,17 @@ app.get("/football", (req, res, next) => {
   try {
     process.env.PRODUCTION_DB_USER;
     res.send("football");
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get("/pie", async (req, res, next) => {
+  try {
+    const result = await pie();
+    res.json({
+      pie:result,
+    });
   } catch (err) {
     next(err);
   }
