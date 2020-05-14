@@ -16,9 +16,11 @@ const app = express();
 app.use(bodyParser.json());
 app.use(expressSanitizer());
 
+//http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com
+
 app.use(function (req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com");
-  
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, OPTIONS, PUT, PATCH, DELETE"
@@ -67,7 +69,7 @@ app.post("/", async (req, res, next) => {
       username: sanitizedUsername,
       password: sanitizedPassword,
     };
-    
+
     await login({
       user: user,
       gateway: searchUser({ user: user, db: dbConnection }),
@@ -82,14 +84,16 @@ app.post("/", async (req, res, next) => {
 
 app.get("/dashboard", async (req, res, next) => {
   try {
-    const weather = await weather();
-    const news = await getNews();
-    const football = await getFootballUpdate();
-    const todoList = await getToDoList();
-    const warmer = await getWarmer();
-    const photos = await getPhotos();
-    const dashboard = [weather, news, football, toDoList, warmer, photos];
-    res.send(dashboard);
+    const weatherReport = await weather();
+    // const news = await getNews();
+    // const football = await getFootballUpdate();
+    // const todoList = await getToDoList();
+    // const warmer = await getWarmer();
+    // const photos = await getPhotos();
+    const dashboard = [weatherReport];
+    res.json({
+      weather: weatherReport,
+    });
   } catch (err) {
     next(err);
   }
@@ -129,18 +133,22 @@ app.get("/photos", (req, res, next) => {
   }
 });
 
-app.get("/weather", async (req, res, next) => {
+app.post("/weather", async (req, res, next) => {
   try {
-    const weatherUpdate = await weather();
-    res.send(weatherUpdate);
+    const location = req.body;
+    const weatherReport = await weather(location);
+
+    res.json({
+      weather: weatherReport,
+    });
   } catch (err) {
     next(err);
   }
 });
 
-// app.listen(8000, () => {
-//   console.log("Example app listening on port 8000!");
-// });
+app.listen(8000, () => {
+  console.log("Example app listening on port 8000!");
+});
 
-//module.exports = app;
-module.exports.handler = serverless(app);
+module.exports = app;
+//module.exports.handler = serverless(app);
