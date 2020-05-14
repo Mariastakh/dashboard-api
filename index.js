@@ -16,8 +16,10 @@ const app = express();
 app.use(bodyParser.json());
 app.use(expressSanitizer());
 
+//http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com
+
 app.use(function (req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com");
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -138,9 +140,9 @@ app.get("/weather", async (req, res, next) => {
   }
 });
 
-// app.listen(8000, () => {
-//   console.log("Example app listening on port 8000!");
-// });
+app.listen(8000, () => {
+  console.log("Example app listening on port 8000!");
+});
 
-//module.exports = app;
-module.exports.handler = serverless(app);
+module.exports = app;
+//module.exports.handler = serverless(app);
