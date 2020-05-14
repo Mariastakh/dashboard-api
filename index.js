@@ -7,6 +7,7 @@ const login = require("./lib/use-cases/LoginUser");
 const createUser = require("./lib/use-cases/CreateUser");
 const weather = require("./lib/use-cases/Weather");
 const news = require("./lib/use-cases/News");
+const getTeams = require("./lib/use-cases/GetTeams");
 const searchUser = require("./lib/gateways/searchUser");
 const createUserGateway = require("./lib/gateways/createUserGateway");
 const dbConnection = require("./lib/pgsqlConnection").pool;
@@ -118,11 +119,12 @@ app.get("/news", async (req, res, next) => {
   }
 });
 
-app.post("/sport", (req, res, next) => {
+app.post("/sport", async (req, res, next) => {
   try {
     const winningTeam = req.body.winningTeam;
     console.log(winningTeam);
-    const losingTeams = ["cat", "dog"];
+    const losingTeams = await getTeams();
+    console.log(losingTeams);
     res.json({
       losingTeams,
     });
