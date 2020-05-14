@@ -118,10 +118,14 @@ app.get("/news", async (req, res, next) => {
   }
 });
 
-app.get("/football", (req, res, next) => {
+app.post("/sport", (req, res, next) => {
   try {
-    process.env.PRODUCTION_DB_USER;
-    res.send("football");
+    const winningTeam = req.body.winningTeam;
+    console.log(winningTeam);
+    const losingTeams = ["cat", "dog"];
+    res.json({
+      losingTeams,
+    });
   } catch (err) {
     next(err);
   }
