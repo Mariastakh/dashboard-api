@@ -110,7 +110,9 @@ app.get("/todo", (req, res, next) => {
 app.get("/news", async (req, res, next) => {
   try {
     const newsUpdate = await news();
-    res.send(newsUpdate);
+    res.json({
+      news: newsUpdate,
+    });
   } catch (err) {
     next(err);
   }
