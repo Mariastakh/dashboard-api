@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const expressSanitizer = require("express-sanitizer");
 const session = require("express-session");
+const uuid = require("uuid/v4");
 
 const login = require("./lib/use-cases/LoginUser");
 const createUser = require("./lib/use-cases/CreateUser");
@@ -15,22 +16,33 @@ const createUserGateway = require("./lib/gateways/createUserGateway");
 const dbConnection = require("./lib/pgsqlConnection").pool;
 
 const app = express();
-
-app.use(bodyParser.json());
-app.use(expressSanitizer());
 app.use(
   session({
-    key: "user_sid",
-    secret: "somerandonstuffs",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      expires: 600000,
-      secure: false,
-      httpOnly: false,
+    genid: (req) => {
+      // console.log('Inside the session middleware')
+      // console.log(req.sessionID)
+      return uuid(); // use UUIDs for session IDs
     },
+    secret: "keyboard cat",
+    resave: false,
+    saveUninitialized: true,
   })
 );
+app.use(bodyParser.json());
+app.use(expressSanitizer());
+// app.use(
+//   session({
+//     key: "user_sid",
+//     secret: "somerandonstuffs",
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       expires: 600000,
+//       secure: false,
+//       httpOnly: false,
+//     },
+//   })
+// );
 
 //"http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com",
 
@@ -91,8 +103,9 @@ function verifyToken(req, res, next) {
 // });
 
 app.get("/status", async (req, res, next) => {
-  console.log(req);
-  if (req.session.user && req.cookies.user_sid) {
+  console.log("STATUS sesh", req.sessionID);
+  console.log("STATUS user", req.session.user);
+  if (req.session.user) { // && req.cookies.user_sid
     res.json({
       message: "woo you're a user!",
     });
@@ -128,6 +141,9 @@ app.post("/signup", async (req, res, next) => {
 
 app.post("/", async (req, res, next) => {
   try {
+    console.log("LOGIN sesh", req.session);
+    console.log("LOGIN sesh id", req.sessionID);
+    console.log("LOGIN sesh user?", req.session.user);
     const sanitizedUsername = req.sanitize(req.body.username);
     const sanitizedPassword = req.sanitize(req.body.password);
 
@@ -140,6 +156,8 @@ app.post("/", async (req, res, next) => {
       user: user,
       gateway: searchUser({ user: user, db: dbConnection }),
     });
+
+    req.session.user = user;
 
     jwt.sign({ user }, `${process.env.SECRET_KEY}`, (err, token) => {
       res.json({
@@ -157,14 +175,16 @@ app.post("/", async (req, res, next) => {
 
 app.get("/dashboard", verifyToken, async (req, res, next) => {
   try {
-    const weather = await weather();
-    const news = await getNews();
-    const football = await getFootballUpdate();
-    const todoList = await getToDoList();
-    const warmer = await getWarmer();
-    const photos = await getPhotos();
-    const dashboard = [weather, news, football, toDoList, warmer, photos];
-    res.send(dashboard);
+    console.log("DASHBOARD sesh user", req.session.user);
+    
+    // const weather = await weather();
+    // const news = await getNews();
+    // const football = await getFootballUpdate();
+    // const todoList = await getToDoList();
+    // const warmer = await getWarmer();
+    // const photos = await getPhotos();
+    // const dashboard = [weather, news, football, toDoList, warmer, photos];
+    res.sendStatus(200);
   } catch (err) {
     next(err);
   }
