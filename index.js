@@ -27,18 +27,18 @@ aws.config.update({
 const S3_BUCKET = process.env.bucket;
 
 const app = express();
-app.use(
-  session({
-    genid: (req) => {
-      // console.log('Inside the session middleware')
-      // console.log(req.sessionID)
-      return uuid(); // use UUIDs for session IDs
-    },
-    secret: "keyboard cat",
-    resave: false,
-    saveUninitialized: true,
-  })
-);
+// app.use(
+//   session({
+//     genid: (req) => {
+//       // console.log('Inside the session middleware')
+//       // console.log(req.sessionID)
+//       return uuid(); // use UUIDs for session IDs
+//     },
+//     secret: "keyboard cat",
+//     resave: false,
+//     saveUninitialized: true,
+//   })
+// );
 
 app.use(bodyParser.json());
 app.use(expressSanitizer());
@@ -56,7 +56,7 @@ app.use(function (req, res, next) {
   // Request headers that are allowed:
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type"
+    "X-Requested-With,content-type, authorization"
   );
 
   // Allow cookeies:
@@ -66,7 +66,9 @@ app.use(function (req, res, next) {
 
 function verifyToken(req, res, next) {
   // get the auth header value.
+  //console.log("headers :", req.headers);
   const bearerHeader = req.headers["authorization"];
+  console.log("bearer header :", bearerHeader);
   // check if bearer is undefined:
   if (bearerHeader !== undefined) {
     // pull the token  out of the bearer:
@@ -125,7 +127,7 @@ app.post("/", async (req, res, next) => {
       gateway: searchUser({ user: user, db: dbConnection }),
     });
 
-    req.session.user = user;
+    // req.session.user = user;
 
     jwt.sign({ user }, `${process.env.SECRET_KEY}`, (err, token) => {
       res.json({
@@ -140,51 +142,39 @@ app.post("/", async (req, res, next) => {
 });
 
 app.post("/upload-image", async (req, res, next) => {
-    const s3 = new aws.S3(); 
-    const fileName = req.body.fileName;
-    const fileType = req.body.fileType;
+  const s3 = new aws.S3();
+  const fileName = req.body.fileName;
+  const fileType = req.body.fileType;
 
-    // Set up the payload to send to the s3 api
-    const s3Params = {
-      Bucket: S3_BUCKET,
-      Key: fileName,
-      Expires: 500,
-      ContentType: fileType,
-      ACL: "public-read",
+  // Set up the payload to send to the s3 api
+  const s3Params = {
+    Bucket: S3_BUCKET,
+    Key: fileName,
+    Expires: 500,
+    ContentType: fileType,
+    ACL: "public-read",
+  };
+
+  // Make a request to the S3 API to get a signed URL which we can use to upload our file
+  s3.getSignedUrl("putObject", s3Params, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({ success: false, error: err });
+    }
+
+    // Data payload of what we are sending back,
+    // the url of the signedRequest and a URL where we can access the content after its saved.
+    const returnData = {
+      signedRequest: data,
+      url: `https://${S3_BUCKET}.s3.amazonaws.com/${fileName}`,
     };
-    
-    // Make a request to the S3 API to get a signed URL which we can use to upload our file
-    s3.getSignedUrl("putObject", s3Params, (err, data) => {
-      
-      if (err) {
-        console.log(err);
-        res.json({ success: false, error: err });
-      }
 
-      // Data payload of what we are sending back, 
-      // the url of the signedRequest and a URL where we can access the content after its saved.
-      const returnData = {
-        signedRequest: data,
-        url: `https://${S3_BUCKET}.s3.amazonaws.com/${fileName}`,
-      };
-
-      res.json({ success: true, data: { returnData } });
-    });
-  
+    res.json({ success: true, data: { returnData } });
+  });
 });
 
 app.get("/dashboard", verifyToken, async (req, res, next) => {
   try {
-    const weatherReport = await weather();
-    // const news = await getNews();
-    // const football = await getFootballUpdate();
-    // const todoList = await getToDoList();
-    // const warmer = await getWarmer();
-    // const photos = await getPhotos();
-    const dashboard = [weatherReport];
-    res.json({
-      weather: weatherReport,
-    });
   } catch (err) {
     next(err);
   }
@@ -229,10 +219,17 @@ app.get("/football", (req, res, next) => {
   }
 });
 
-app.get("/photos", (req, res, next) => {
+app.get("/photos", verifyToken, (req, res, next) => {
   try {
-    res.send("paths");
+    jwt.verify(req.token, `${process.env.SECRET_KEY}`, (error, authData) => {
+      if (error) {
+        res.sendStatus(403);
+      } else {
+        res.json({ message: "to do list:", authData });
+      }
+    });
   } catch (err) {
+    res.send(400);
     next(err);
   }
 });
