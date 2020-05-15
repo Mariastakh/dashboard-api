@@ -1,8 +1,12 @@
+const dotenv = require("dotenv").config();
 const serverless = require("serverless-http");
 const express = require("express");
 const bodyParser = require("body-parser");
 const expressSanitizer = require("express-sanitizer");
-const dotenv = require("dotenv").config();
+const jwt = require("jsonwebtoken");
+const session = require("express-session");
+const {uuid} = require("uuidv4");
+
 const login = require("./lib/use-cases/LoginUser");
 const createUser = require("./lib/use-cases/CreateUser");
 const weather = require("./lib/use-cases/Weather");
@@ -12,6 +16,19 @@ const createUserGateway = require("./lib/gateways/createUserGateway");
 const dbConnection = require("./lib/pgsqlConnection").pool;
 
 const app = express();
+app.use(
+  session({
+    genid: (req) => {
+      // console.log('Inside the session middleware')
+      // console.log(req.sessionID)
+      return uuid(); // use UUIDs for session IDs
+    },
+    secret: "keyboard cat",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
 
 app.use(bodyParser.json());
 app.use(expressSanitizer());
@@ -37,8 +54,31 @@ app.use(function (req, res, next) {
   next();
 });
 
+function verifyToken(req, res, next) {
+  // get the auth header value.
+  const bearerHeader = req.headers["authorization"];
+  // check if bearer is undefined:
+  if (bearerHeader !== undefined) {
+    // pull the token  out of the bearer:
+    // 1. split the bearer header on the space:
+    const bearer = bearerHeader.split(" ");
+    // 2. get the token from the aray:
+    const bearerToken = bearer[1];
+    // set the token:
+    req.token = bearerToken;
+
+    next();
+  } else {
+    // forbidden:
+    res.sendStatus(403);
+  }
+}
+
 app.post("/signup", async (req, res, next) => {
   try {
+    // console.log("LOGIN sesh", req.session);
+    // console.log("LOGIN sesh id", req.sessionID);
+    // console.log("LOGIN sesh user?", req.session.user);
     const sanitizedUsername = req.sanitize(req.body.username);
     const sanitizedPassword = req.sanitize(req.body.password);
     const sanitizedEmail = req.sanitize(req.body.email);
@@ -75,14 +115,21 @@ app.post("/", async (req, res, next) => {
       gateway: searchUser({ user: user, db: dbConnection }),
     });
 
-    res.sendStatus(200);
+    req.session.user = user;
+
+    jwt.sign({ user }, `${process.env.SECRET_KEY}`, (err, token) => {
+      res.json({
+        user,
+        token,
+      });
+    });
   } catch (err) {
     res.sendStatus(400);
     next(err);
   }
 });
 
-app.get("/dashboard", async (req, res, next) => {
+app.get("/dashboard", verifyToken, async (req, res, next) => {
   try {
     const weatherReport = await weather();
     // const news = await getNews();
