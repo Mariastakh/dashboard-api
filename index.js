@@ -6,17 +6,25 @@ const expressSanitizer = require("express-sanitizer");
 const jwt = require("jsonwebtoken");
 const session = require("express-session");
 const { uuid } = require("uuidv4");
+const aws = require("aws-sdk");
 
 const login = require("./lib/use-cases/LoginUser");
 const createUser = require("./lib/use-cases/CreateUser");
 const weather = require("./lib/use-cases/Weather");
 const news = require("./lib/use-cases/News");
-const getTeams = require("./lib/use-cases/GetTeams");
 const searchUser = require("./lib/gateways/searchUser");
 const createUserGateway = require("./lib/gateways/createUserGateway");
 const searchTasksGateway = require("./lib/gateways/searchTasksGateway");
 const searchTasks = require("./lib/use-cases/searchTasks");
 const dbConnection = require("./lib/pgsqlConnection").pool;
+
+aws.config.update({
+  region: "eu-west-2",
+  // accessKeyId: process.env.S3AccessKeyId,
+  // secretAccessKey: process.env.S3SecretKey
+});
+
+const S3_BUCKET = process.env.bucket;
 
 const app = express();
 app.use(
@@ -131,6 +139,39 @@ app.post("/", async (req, res, next) => {
   }
 });
 
+app.post("/upload-image", async (req, res, next) => {
+  console.log("in request");
+
+    const s3 = new aws.S3(); // Create a new instance of S3
+    const fileName = req.body.fileName;
+    const fileType = req.body.fileType;
+    // Set up the payload of what we are sending to the S3 api
+    const s3Params = {
+      Bucket: S3_BUCKET,
+      Key: fileName,
+      Expires: 500,
+      ContentType: fileType,
+      ACL: "public-read",
+    };
+    // Make a request to the S3 API to get a signed URL which we can use to upload our file
+    s3.getSignedUrl("putObject", s3Params, (err, data) => {
+      
+      if (err) {
+        console.log(err);
+        res.json({ success: false, error: err });
+      }
+      // Data payload of what we are sending back, the url of the signedRequest and a URL where we can access the content after its saved.
+      const returnData = {
+        signedRequest: data,
+        url: `https://${S3_BUCKET}.s3.amazonaws.com/${fileName}`,
+      };
+      // Send it all back
+      console.log(returnData)
+      res.json({ success: true, data: { returnData } });
+    });
+  
+});
+
 app.get("/dashboard", verifyToken, async (req, res, next) => {
   try {
     const weatherReport = await weather();
@@ -159,7 +200,7 @@ app.get("/tasks", async (req, res, next) => {
     res.json({
       tasks: [
         { name: "do something", status: false },
-        { name: "do something else", status: true },
+        { name: "do something", status: true },
       ],
     });
   } catch (err) {
@@ -178,15 +219,10 @@ app.get("/news", async (req, res, next) => {
   }
 });
 
-app.post("/sport", async (req, res, next) => {
+app.get("/football", (req, res, next) => {
   try {
-    const winningTeam = req.body.winningTeam;
-    console.log(winningTeam);
-    const losingTeams = await getTeams(winningTeam);
-    console.log(losingTeams);
-    res.json({
-      losingTeams,
-    });
+    process.env.PRODUCTION_DB_USER;
+    res.send("football");
   } catch (err) {
     next(err);
   }
