@@ -1,8 +1,12 @@
+const dotenv = require("dotenv").config();
 const serverless = require("serverless-http");
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const expressSanitizer = require("express-sanitizer");
-const dotenv = require("dotenv").config();
+const session = require("express-session");
+const uuid = require("uuid/v4");
+
 const login = require("./lib/use-cases/LoginUser");
 const createUser = require("./lib/use-cases/CreateUser");
 const weather = require("./lib/use-cases/Weather");
@@ -12,9 +16,35 @@ const createUserGateway = require("./lib/gateways/createUserGateway");
 const dbConnection = require("./lib/pgsqlConnection").pool;
 
 const app = express();
-
+app.use(
+  session({
+    genid: (req) => {
+      // console.log('Inside the session middleware')
+      // console.log(req.sessionID)
+      return uuid(); // use UUIDs for session IDs
+    },
+    secret: "keyboard cat",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 app.use(bodyParser.json());
 app.use(expressSanitizer());
+// app.use(
+//   session({
+//     key: "user_sid",
+//     secret: "somerandonstuffs",
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       expires: 600000,
+//       secure: false,
+//       httpOnly: false,
+//     },
+//   })
+// );
+
+//"http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com",
 
 //http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com
 
@@ -35,6 +65,58 @@ app.use(function (req, res, next) {
   // Allow cookeies:
   res.setHeader("Access-Control-Allow-Credentials", true);
   next();
+});
+
+// app.use((req, res, next) => {
+//   if (req.cookies.user_sid && !req.session.user) {
+//     res.clearCookie("user_sid");
+//   }
+//   next();
+// });
+
+// format of token:
+// Authorization: Bearer <access_token>
+
+function verifyToken(req, res, next) {
+  // get the auth header value.
+  const bearerHeader = req.headers["authorization"];
+  // check if bearer is undefined:
+  if (bearerHeader !== undefined) {
+    // pull the token  out of the bearer:
+    // 1. split the bearer header on the space:
+    const bearer = bearerHeader.split(" ");
+    // 2. get the token from the aray:
+    const bearerToken = bearer[1];
+    // set the token:
+    req.token = bearerToken;
+
+    next();
+  } else {
+    // forbidden:
+    res.sendStatus(403);
+  }
+}
+
+// app.use((req, res, next) => {
+//   if (req.cookies.user_sid && !req.session.user) {
+//     res.clearCookie("user_sid");
+//   }
+//   next();
+// });
+
+app.get("/status", async (req, res, next) => {
+  console.log("STATUS sesh", req.sessionID);
+  console.log("STATUS user", req.session.user);
+  if (req.session.user) {
+    // && req.cookies.user_sid
+    res.json({
+      message: "woo you're a user!",
+    });
+  } else {
+    res.json({
+      message: "not signed in init",
+    });
+  }
 });
 
 app.post("/signup", async (req, res, next) => {
@@ -62,6 +144,9 @@ app.post("/signup", async (req, res, next) => {
 
 app.post("/", async (req, res, next) => {
   try {
+    console.log("LOGIN sesh", req.session);
+    console.log("LOGIN sesh id", req.sessionID);
+    console.log("LOGIN sesh user?", req.session.user);
     const sanitizedUsername = req.sanitize(req.body.username);
     const sanitizedPassword = req.sanitize(req.body.password);
 
@@ -75,40 +160,56 @@ app.post("/", async (req, res, next) => {
       gateway: searchUser({ user: user, db: dbConnection }),
     });
 
-    res.sendStatus(200);
+    req.session.user = user;
+
+    jwt.sign({ user }, `${process.env.SECRET_KEY}`, (err, token) => {
+      res.json({
+        user,
+        token,
+      });
+    });
+
+    //res.sendStatus(200);
   } catch (err) {
     res.sendStatus(400);
     next(err);
   }
 });
 
-app.get("/dashboard", async (req, res, next) => {
+app.get("/dashboard", verifyToken, async (req, res, next) => {
   try {
-    const weatherReport = await weather();
+    console.log("DASHBOARD sesh user", req.session.user);
+    // const weatherReport = await weather();
     // const news = await getNews();
     // const football = await getFootballUpdate();
     // const todoList = await getToDoList();
     // const warmer = await getWarmer();
     // const photos = await getPhotos();
-    const dashboard = [weatherReport];
-    res.json({
-      weather: weatherReport,
-    });
+    // const dashboard = [weather, news, football, toDoList, warmer, photos];
+    res.sendStatus(200);
   } catch (err) {
     next(err);
   }
 });
 
-app.get("/todo", (req, res, next) => {
+app.get("/todo", verifyToken, async (req, res, next) => {
   try {
-    res.send("to do list");
+    jwt.verify(req.token, `${process.env.SECRET_KEY}`, (error, authData) => {
+      if (error) {
+        res.sendStatus(403);
+      } else {
+        res.json({ message: "to do list:", authData });
+      }
+    });
   } catch (err) {
+    res.send(400);
     next(err);
   }
 });
 
 app.get("/news", async (req, res, next) => {
   try {
+    console.log(req);
     const newsUpdate = await news();
     res.json({
       news: newsUpdate,
