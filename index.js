@@ -46,6 +46,8 @@ app.use(expressSanitizer());
 
 //"http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com",
 
+//http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com
+
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
 
@@ -177,8 +179,7 @@ app.post("/", async (req, res, next) => {
 app.get("/dashboard", verifyToken, async (req, res, next) => {
   try {
     console.log("DASHBOARD sesh user", req.session.user);
-
-    // const weather = await weather();
+    // const weatherReport = await weather();
     // const news = await getNews();
     // const football = await getFootballUpdate();
     // const todoList = await getToDoList();
@@ -210,7 +211,9 @@ app.get("/news", async (req, res, next) => {
   try {
     console.log(req);
     const newsUpdate = await news();
-    res.send(newsUpdate);
+    res.json({
+      news: newsUpdate,
+    });
   } catch (err) {
     next(err);
   }
@@ -233,10 +236,14 @@ app.get("/photos", (req, res, next) => {
   }
 });
 
-app.get("/weather", async (req, res, next) => {
+app.post("/weather", async (req, res, next) => {
   try {
-    const weatherUpdate = await weather();
-    res.send(weatherUpdate);
+    const location = req.body;
+    const weatherReport = await weather(location);
+
+    res.json({
+      weather: weatherReport,
+    });
   } catch (err) {
     next(err);
   }
