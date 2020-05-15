@@ -11,6 +11,7 @@ const login = require("./lib/use-cases/LoginUser");
 const createUser = require("./lib/use-cases/CreateUser");
 const weather = require("./lib/use-cases/Weather");
 const news = require("./lib/use-cases/News");
+const getTeams = require("./lib/use-cases/GetTeams");
 const searchUser = require("./lib/gateways/searchUser");
 const createUserGateway = require("./lib/gateways/createUserGateway");
 const searchTasksGateway = require("./lib/gateways/searchTasksGateway");
@@ -177,10 +178,15 @@ app.get("/news", async (req, res, next) => {
   }
 });
 
-app.get("/football", (req, res, next) => {
+app.post("/sport", async (req, res, next) => {
   try {
-    process.env.PRODUCTION_DB_USER;
-    res.send("football");
+    const winningTeam = req.body.winningTeam;
+    console.log(winningTeam);
+    const losingTeams = await getTeams(winningTeam);
+    console.log(losingTeams);
+    res.json({
+      losingTeams,
+    });
   } catch (err) {
     next(err);
   }
