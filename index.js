@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const expressSanitizer = require("express-sanitizer");
 const jwt = require("jsonwebtoken");
 const session = require("express-session");
-const {uuid} = require("uuidv4");
+const { uuid } = require("uuidv4");
 
 const login = require("./lib/use-cases/LoginUser");
 const createUser = require("./lib/use-cases/CreateUser");
@@ -13,6 +13,8 @@ const weather = require("./lib/use-cases/Weather");
 const news = require("./lib/use-cases/News");
 const searchUser = require("./lib/gateways/searchUser");
 const createUserGateway = require("./lib/gateways/createUserGateway");
+const searchTasksGateway = require("./lib/gateways/searchTasksGateway");
+const searchTasks = require("./lib/use-cases/searchTasks");
 const dbConnection = require("./lib/pgsqlConnection").pool;
 
 const app = express();
@@ -28,7 +30,6 @@ app.use(
     saveUninitialized: true,
   })
 );
-
 
 app.use(bodyParser.json());
 app.use(expressSanitizer());
@@ -146,9 +147,20 @@ app.get("/dashboard", verifyToken, async (req, res, next) => {
   }
 });
 
-app.get("/todo", (req, res, next) => {
+app.get("/tasks", async (req, res, next) => {
   try {
-    res.send("to do list");
+    const tasks = await searchTasks({
+      user: "james",
+      gateway: searchTasksGateway({ user: "james", db: dbConnection }),
+    });
+    console.log(tasks);
+
+    res.json({
+      tasks: [
+        { name: "do something", status: false },
+        { name: "do something else", status: true },
+      ],
+    });
   } catch (err) {
     next(err);
   }
