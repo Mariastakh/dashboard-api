@@ -199,7 +199,7 @@ app.get("/tasks", async (req, res, next) => {
   }
 });
 
-app.get("/news", async (req, res, next) => {
+app.get("/news", verifyToken, async (req, res, next) => {
   try {
     const newsUpdate = await news();
     res.json({
