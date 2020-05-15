@@ -225,11 +225,29 @@ app.get("/photos", verifyToken, (req, res, next) => {
       if (error) {
         res.sendStatus(403);
       } else {
-        res.json({ message: "to do list:", authData });
+        const decoded = jwt.verify(req.token, process.env.SECRET_KEY);
+        const user = decoded.user.username;
+
+        const s3 = new aws.S3();
+
+        // Create the parameters for calling listObjects
+        var bucketParams = {
+          Bucket: process.env.Bucket,
+        };
+
+        // Call S3 to obtain a list of the objects in the bucket
+        s3.listObjects(bucketParams, function (err, data) {
+          if (err) {
+            console.log("Error", err);
+          } else {
+            console.log("Success", data);
+          }
+        });
+        // query the db
       }
     });
   } catch (err) {
-    res.send(400);
+    res.sendStatus(400);
     next(err);
   }
 });
