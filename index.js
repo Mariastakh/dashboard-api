@@ -105,7 +105,8 @@ function verifyToken(req, res, next) {
 app.get("/status", async (req, res, next) => {
   console.log("STATUS sesh", req.sessionID);
   console.log("STATUS user", req.session.user);
-  if (req.session.user) { // && req.cookies.user_sid
+  if (req.session.user) {
+    // && req.cookies.user_sid
     res.json({
       message: "woo you're a user!",
     });
@@ -176,7 +177,7 @@ app.post("/", async (req, res, next) => {
 app.get("/dashboard", verifyToken, async (req, res, next) => {
   try {
     console.log("DASHBOARD sesh user", req.session.user);
-    
+
     // const weather = await weather();
     // const news = await getNews();
     // const football = await getFootballUpdate();
@@ -207,6 +208,7 @@ app.get("/todo", verifyToken, async (req, res, next) => {
 
 app.get("/news", async (req, res, next) => {
   try {
+    console.log(req);
     const newsUpdate = await news();
     res.send(newsUpdate);
   } catch (err) {
