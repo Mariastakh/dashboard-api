@@ -123,7 +123,7 @@ app.post("/sport", async (req, res, next) => {
   try {
     const winningTeam = req.body.winningTeam;
     console.log(winningTeam);
-    const losingTeams = await getTeams();
+    const losingTeams = await getTeams(winningTeam);
     console.log(losingTeams);
     res.json({
       losingTeams,
