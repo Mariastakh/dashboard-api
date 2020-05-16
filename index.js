@@ -158,13 +158,17 @@ app.get("/tasks", async (req, res, next) => {
 
     res.json({
       tasks: [
-        { name: "do something", status: false },
-        { name: "do something else", status: true },
+        { name: "do something", status: false, id: 1 },
+        { name: "do something else", status: true, id: 2 },
       ],
     });
   } catch (err) {
     next(err);
   }
+});
+
+app.post("/update-task", async (req, res, next) => {
+  console.log(req);
 });
 
 app.get("/news", async (req, res, next) => {
