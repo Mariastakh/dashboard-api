@@ -190,8 +190,8 @@ app.get("/tasks", async (req, res, next) => {
 
     res.json({
       tasks: [
-        { name: "do something", status: false },
-        { name: "do something", status: true },
+        { name: "do something", status: false, id: 1 },
+        { name: "do something else", status: true, id: 2 },
       ],
     });
   } catch (err) {
@@ -199,7 +199,12 @@ app.get("/tasks", async (req, res, next) => {
   }
 });
 
-app.get("/news", verifyToken, async (req, res, next) => {
+
+app.post("/update-task", async (req, res, next) => {
+  console.log(req);
+});
+
+app.get("/news", async (req, res, next) => {
   try {
     const newsUpdate = await news();
     res.json({
@@ -210,14 +215,15 @@ app.get("/news", verifyToken, async (req, res, next) => {
   }
 });
 
-app.get("/football", (req, res, next) => {
-  try {
-    process.env.PRODUCTION_DB_USER;
-    res.send("football");
-  } catch (err) {
+
+app.post("/sport", async (req, res, next) => {
+  const winningTeam = req.body.winningTeam;
+
+  await getTeams({ winningTeam, res }).catch((err) => {
     next(err);
-  }
+  });
 });
+
 
 app.get("/photos", verifyToken, (req, res, next) => {
   try {
