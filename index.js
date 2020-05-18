@@ -29,26 +29,15 @@ aws.config.update({
 const S3_BUCKET = process.env.bucket;
 
 const app = express();
-// app.use(
-//   session({
-//     genid: (req) => {
-//       // console.log('Inside the session middleware')
-//       // console.log(req.sessionID)
-//       return uuid(); // use UUIDs for session IDs
-//     },
-//     secret: "keyboard cat",
-//     resave: false,
-//     saveUninitialized: true,
-//   })
-// );
 
 app.use(bodyParser.json());
 app.use(expressSanitizer());
 
 //http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com
+//http://localhost:3000
 
 app.use(function (req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.setHeader("Access-Control-Allow-Origin", "http://dashboard-application-ui.s3-website.eu-west-2.amazonaws.com");
 
   res.setHeader(
     "Access-Control-Allow-Methods",

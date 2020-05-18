@@ -192,7 +192,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dashboard/production/1589309735104-2020-05-12T18:55:35.104Z/dashboard.zip"
+          "S3Key": "serverless/dashboard/production/1589819097235-2020-05-18T16:24:57.235Z/dashboard.zip"
         },
         "FunctionName": "dashboard-production-app",
         "Handler": "s_app.handler",
@@ -211,14 +211,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "AppLambdaVersionWhuU7auxXt4vuJ0qczKd6pEuGZ35l3hvqeH1b9Vy88": {
+    "AppLambdaVersionouRvRggM396640RAelsZwzd4zDDAVrVKcacbIVxERZg": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "AppLambdaFunction"
         },
-        "CodeSha256": "l9+kQnxbmLJdDZbkRQT+ojFpKq7DPMcyNFL0NP78HT8="
+        "CodeSha256": "a2Lyf5Q6AKGGHUiGxuy1k0AbgGynCAQqSwrr5q0urww="
       }
     },
     "ApiGatewayRestApi": {
@@ -337,7 +337,7 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1589309690328": {
+    "ApiGatewayDeployment1589819053000": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -496,7 +496,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/dashboard/production/1589309735104-2020-05-12T18:55:35.104Z/custom-resources.zip"
+          "S3Key": "serverless/dashboard/production/1589819097235-2020-05-18T16:24:57.235Z/custom-resources.zip"
         },
         "FunctionName": "dashboard-production-custom-resource-apigw-cw-role",
         "Handler": "apiGatewayCloudWatchRole/handler.handler",
@@ -552,7 +552,7 @@
     "AppLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "AppLambdaVersionWhuU7auxXt4vuJ0qczKd6pEuGZ35l3hvqeH1b9Vy88"
+        "Ref": "AppLambdaVersionouRvRggM396640RAelsZwzd4zDDAVrVKcacbIVxERZg"
       }
     },
     "ServiceEndpoint": {
