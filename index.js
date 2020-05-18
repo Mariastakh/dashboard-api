@@ -183,18 +183,19 @@ app.get("/news", async (req, res, next) => {
 });
 
 app.post("/sport", async (req, res, next) => {
-  try {
-    const winningTeam = req.body.winningTeam;
-    console.log(winningTeam);
-    const losingTeams = await getTeams(winningTeam);
-    console.log(losingTeams);
-    res.json({
-      losingTeams,
-    });
-  } catch (err) {
+  const winningTeam = req.body.winningTeam;
+
+  await getTeams({ winningTeam, res }).catch((err) => {
     next(err);
-  }
+  });
 });
+
+// const losingTeams = await getTeams(winningTeam);
+// console.log(losingTeams);
+
+// res.json({
+//   losingTeams,
+// });
 
 app.get("/photos", (req, res, next) => {
   try {
