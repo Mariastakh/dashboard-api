@@ -9,7 +9,7 @@ describe("Dashboard", () => {
     expect(response.status).toBe(201);
   });
 
-  it("Should log a user in", async () => {
+  xit("Should log a user in", async () => {
     const response = await request("http://localhost:8000")
       .post("/")
       .send({ name: "james", password: "smelly" })
@@ -22,12 +22,12 @@ describe("Dashboard", () => {
     expect(response.text).toContain("location");
   });
 
-  it("Should have a to do list", async () => {
+  xit("Should have a to do list", async () => {
     const response = await request("http://localhost:8000").get("/todo");
     expect(response.text).toContain("to do list");
   });
 
-  it("Should have the news", async () => {
+  xit("Should have the news", async () => {
     const response = await request("http://localhost:8000").get("/news");
     const news = JSON.parse(response.text);
     expect(news).toHaveProperty("title");
@@ -35,12 +35,12 @@ describe("Dashboard", () => {
     expect(news).toHaveProperty("content");
   });
 
-  it("Should have a football update", async () => {
-    const response = await request("http://localhost:8000").get("/football");
+  xit("Should have a football update", async () => {
+    const response = await request("http://localhost:8000").get("/sport");
     expect(response.text).toContain("football");
   });
 
-  it("Should have photos", async () => {
+  xit("Should have photos", async () => {
     const response = await request("http://localhost:8000").get("/photos");
     expect(response.text).toContain("paths");
   });
