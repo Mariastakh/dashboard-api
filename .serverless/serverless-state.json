@@ -208,7 +208,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/dashboard/production/1589819097235-2020-05-18T16:24:57.235Z/dashboard.zip"
+                "S3Key": "serverless/dashboard/production/1589823830227-2020-05-18T17:43:50.227Z/dashboard.zip"
               },
               "FunctionName": "dashboard-production-app",
               "Handler": "s_app.handler",
@@ -227,14 +227,14 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "AppLambdaVersionouRvRggM396640RAelsZwzd4zDDAVrVKcacbIVxERZg": {
+          "AppLambdaVersionfN8npFDjuJpnkm2Eiph0WxwgJWQ3ZDzrWlRlETc": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AppLambdaFunction"
               },
-              "CodeSha256": "a2Lyf5Q6AKGGHUiGxuy1k0AbgGynCAQqSwrr5q0urww="
+              "CodeSha256": "42czzbMiiCVl1zv44semXV1iX+S8/ztVKHTuVKRozk4="
             }
           },
           "ApiGatewayRestApi": {
@@ -353,7 +353,7 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1589819053000": {
+          "ApiGatewayDeployment1589823787683": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -512,7 +512,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/dashboard/production/1589819097235-2020-05-18T16:24:57.235Z/custom-resources.zip"
+                "S3Key": "serverless/dashboard/production/1589823830227-2020-05-18T17:43:50.227Z/custom-resources.zip"
               },
               "FunctionName": "dashboard-production-custom-resource-apigw-cw-role",
               "Handler": "apiGatewayCloudWatchRole/handler.handler",
@@ -568,7 +568,7 @@
           "AppLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AppLambdaVersionouRvRggM396640RAelsZwzd4zDDAVrVKcacbIVxERZg"
+              "Ref": "AppLambdaVersionfN8npFDjuJpnkm2Eiph0WxwgJWQ3ZDzrWlRlETc"
             }
           },
           "ServiceEndpoint": {
@@ -691,7 +691,7 @@
         "timeout": 10,
         "runtime": "nodejs10.x",
         "vpc": {},
-        "versionLogicalId": "AppLambdaVersionouRvRggM396640RAelsZwzd4zDDAVrVKcacbIVxERZg"
+        "versionLogicalId": "AppLambdaVersionfN8npFDjuJpnkm2Eiph0WxwgJWQ3ZDzrWlRlETc"
       }
     },
     "serviceFilename": "serverless.yml",
@@ -705,7 +705,7 @@
     "artifact": "C:\\Users\\Pootpoot\\Documents\\repos\\dashboard\\.serverless\\dashboard.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/dashboard/production/1589819097235-2020-05-18T16:24:57.235Z",
+    "artifactDirectoryName": "serverless/dashboard/production/1589823830227-2020-05-18T17:43:50.227Z",
     "artifact": "dashboard.zip"
   }
 }
