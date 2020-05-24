@@ -197,7 +197,7 @@ app.get("/news", async (req, res, next) => {
   }
 });
 
-app.get("/sport/:winningTeam", async (req, res, next) => {
+app.get("/teams/:winningTeam", async (req, res, next) => {
   const winningTeam = req.params.winningTeam;
 
   await getTeams({ winningTeam, res }).catch((err) => {
