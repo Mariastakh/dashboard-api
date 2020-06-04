@@ -158,7 +158,7 @@ app.post("/", async (req, res, next) => {
       });
     });
   } catch (err) {
-    res.sendStatus(400);
+    res.status(400).send("Wrong password or username");
     next(err);
   }
 });
