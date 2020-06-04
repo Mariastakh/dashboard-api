@@ -78,7 +78,7 @@ function verifyToken(req, res, next) {
   }
 }
 
-app.post("/signup", async (req, res, next) => {
+app.post("/register", async (req, res, next) => {
   try {
     const sanitizedUsername = req.sanitize(req.body.username);
     const sanitizedPassword = req.sanitize(req.body.password);

@@ -1,9 +1,9 @@
 const request = require("supertest");
 
 describe("Dashboard", () => {
-  xit("Should signup a new user", async () => {
+  xit("Should register a new user", async () => {
     const response = await request("http://localhost:8000")
-      .post("/signup")
+      .post("/register")
       .send({ name: "me", password: "123", email: "maria@me" })
       .setEncoding("Accept", "application/json");
     expect(response.status).toBe(201);
