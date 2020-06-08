@@ -137,7 +137,7 @@ app.post("/register", async (req, res, next) => {
       user: { username: sanitizedUsername, email: sanitizedEmail },
     });
   } catch (err) {
-    res.status(400).send(err.messages);
+    res.status(400).send(err.message);
     next(err);
   }
 });
