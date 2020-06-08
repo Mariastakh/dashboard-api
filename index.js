@@ -89,11 +89,14 @@ app.post("/register", async (req, res, next) => {
       password: sanitizedPassword,
       email: sanitizedEmail,
     };
-    const createdUser = await createUser({
+
+    // this call needs to check whether the email or username already exist, throw error if yes
+    await createUser({
       user: user,
       gateway: createUserGateway({ user: user, db: dbConnection }),
     });
 
+    // S3 STUFF:
     // // upload image to s3
     // const s3 = new aws.S3();
     // const fileName = req.body.fileName;
@@ -130,8 +133,11 @@ app.post("/register", async (req, res, next) => {
 
     // res.json({ success: true, data: { returnData } });
     // });
+    res.json({
+      user: { username: sanitizedUsername, email: sanitizedEmail },
+    });
   } catch (err) {
-    res.sendStatus(400);
+    res.status(400).send(err.messages);
     next(err);
   }
 });
