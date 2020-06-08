@@ -94,42 +94,42 @@ app.post("/register", async (req, res, next) => {
       gateway: createUserGateway({ user: user, db: dbConnection }),
     });
 
-    // upload image to s3
-    const s3 = new aws.S3();
-    const fileName = req.body.fileName;
-    const fileType = req.body.fileType;
+    // // upload image to s3
+    // const s3 = new aws.S3();
+    // const fileName = req.body.fileName;
+    // const fileType = req.body.fileType;
 
-    // Save image name in db:
-    await createImage({
-      userId: createdUser,
-      imageName: fileName,
-      gateway: createImageGateway({ db: dbConnection }),
-    });
+    // // Save image name in db:
+    // await createImage({
+    //   userId: createdUser,
+    //   imageName: fileName,
+    //   gateway: createImageGateway({ db: dbConnection }),
+    // });
 
-    // Set up the payload to send to the s3 api
-    const s3Params = {
-      Bucket: S3_BUCKET,
-      Key: fileName,
-      Expires: 500,
-      ContentType: fileType,
-      ACL: "public-read",
-    };
+    // // Set up the payload to send to the s3 api
+    // const s3Params = {
+    //   Bucket: S3_BUCKET,
+    //   Key: fileName,
+    //   Expires: 500,
+    //   ContentType: fileType,
+    //   ACL: "public-read",
+    // };
 
-    s3.getSignedUrl("putObject", s3Params, (err, data) => {
-      if (err) {
-        console.log(err);
-        res.json({ success: false, error: err });
-      }
+    // s3.getSignedUrl("putObject", s3Params, (err, data) => {
+    //   if (err) {
+    //     console.log(err);
+    //     res.json({ success: false, error: err });
+    //   }
 
-      // Data payload of what we are sending back,
-      // the url of the signedRequest and a URL where we can access the content after its saved.
-      const returnData = {
-        signedRequest: data,
-        url: `https://${S3_BUCKET}.s3.amazonaws.com/${fileName}`,
-      };
+    //   // Data payload of what we are sending back,
+    //   // the url of the signedRequest and a URL where we can access the content after its saved.
+    //   const returnData = {
+    //     signedRequest: data,
+    //     url: `https://${S3_BUCKET}.s3.amazonaws.com/${fileName}`,
+    //   };
 
-      res.json({ success: true, data: { returnData } });
-    });
+    // res.json({ success: true, data: { returnData } });
+    // });
   } catch (err) {
     res.sendStatus(400);
     next(err);
@@ -152,6 +152,7 @@ app.post("/", async (req, res, next) => {
     });
 
     jwt.sign({ user }, `${process.env.SECRET_KEY}`, (err, token) => {
+      delete user.password;
       res.json({
         user,
         token,
